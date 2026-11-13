@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cartão de Vacinas | Dalila Leite Saldanha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Overlay de Carregamento -->
+  <div id="loader" class="loader-overlay hidden">
+    <div class="spinner"></div>
+    <p id="loader-text">Sincronizando com o Google Drive...</p>
+  </div>
+
+  <!-- Notificação Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Cabeçalho Profissional -->
+  <header class="app-header">
+    <div class="container header-content">
+      <div class="brand">
+        <div class="brand-icon">💉</div>
+        <div>
+          <h1>Dalila Leite Saldanha</h1>
+          <p class="subtitle">Farmacêutica Vacinadora &bull; <span class="crf-badge">CRF 8640CE</span></p>
+        </div>
+      </div>
+      <button id="btn-novo-paciente" class="btn btn-pink">
+        <span>+ Novo Paciente</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    <!-- Barra de Pesquisa -->
+    <section class="search-section card">
+      <label for="search-input" class="search-label">Buscar Paciente Cadastrado</label>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Digite o nome completo, CPF ou telefone do paciente..."
+          autocomplete="off"
+        />
+        <button id="btn-clear-search" class="btn-clear hidden" title="Limpar busca">✕</button>
+      </div>
+      <p class="helper-text" id="pacientes-count">Carregando pacientes...</p>
+    </section>
+
+    <!-- Lista de Resultados da Pesquisa -->
+    <section id="lista-pacientes-section" class="patients-grid"></section>
+
+<!-- Calendário / Agenda de Próximas Doses -->
+    <section id="agenda-calendario-section" class="card calendar-card">
+      <div class="calendar-header">
+        <div>
+          <h3>📅 Agenda de Próximas Doses</h3>
+          <p class="helper-text" style="margin-top: 2px;">Clique em um agendamento para abrir a ficha do paciente</p>
+        </div>
+        <div class="calendar-nav">
+          <button type="button" id="btn-cal-prev" class="btn btn-outline" title="Mês anterior">◀</button>
+          <button type="button" id="btn-cal-hoje" class="btn btn-outline">Hoje</button>
+          <span id="cal-mes-ano" class="calendar-month-label">Mês / Ano</span>
+          <button type="button" id="btn-cal-next" class="btn btn-outline" title="Próximo mês">▶</button>
+        </div>
+      </div>
+
+      <div class="calendar-weekdays">
+        <div>Dom</div>
+        <div>Seg</div>
+        <div>Ter</div>
+        <div>Qua</div>
+        <div>Qui</div>
+        <div>Sex</div>
+        <div>Sáb</div>
+      </div>
+
+      <div id="calendar-grid" class="calendar-grid"></div>
+    </section>
+
+    <!-- Ficha / Prontuário do Paciente Selecionado -->
+    <section id="ficha-paciente-section" class="patient-record hidden">
+      <div class="record-top-bar">
+        <button id="btn-voltar-lista" class="btn btn-outline">← Voltar para a busca</button>
+        <span id="badge-menor" class="badge badge-pink hidden">Menor de Idade</span>
+      </div>
+
+      <!-- Dados Cadastrais -->
+      <div class="card record-header-card">
+        <div class="record-title-row">
+          <div>
+            <h2 id="ficha-nome">Nome do Paciente</h2>
+            <p class="record-meta" id="ficha-idade-nasc">Nascimento: --/--/----</p>
+          </div>
+          <button id="btn-abrir-modal-vacina" class="btn btn-blue">
+            + Adicionar Nova Aplicação
+          </button>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">CPF</span>
+            <strong id="ficha-cpf">---</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Contato / WhatsApp</span>
+            <strong id="ficha-contato">---</strong>
+          </div>
+        </div>
+
+        <!-- Dados do Responsável (exibido apenas se menor de idade) -->
+        <div id="ficha-responsavel-box" class="responsavel-box hidden">
+          <h3>Dados do Responsável Legal</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Nome do Responsável</span>
+              <strong id="ficha-resp-nome">---</strong>
+            </div>
+            <div class="info-item">
+              <span class="info-label">CPF do Responsável</span>
+              <strong id="ficha-resp-cpf">---</strong>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Parentesco</span>
+              <strong id="ficha-resp-parentesco">---</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Histórico de Vacinas -->
+      <div class="card vaccines-card">
+        <div class="section-header">
+          <h3>Histórico e Acompanhamento de Vacinas</h3>
+          <span id="total-vacinas-badge" class="badge badge-blue">0 aplicações</span>
+        </div>
+
+        <div id="vacinas-vazio" class="empty-state">
+          Nenhuma aplicação de vacina registrada para este paciente ainda.
+        </div>
+
+        <div class="table-responsive" id="vacinas-table-wrapper">
+          <table class="vaccines-table">
+            <thead>
+              <tr>
+                <th>Data Aplicação</th>
+                <th>Vacina</th>
+                <th>Marca / Fabricante</th>
+                <th>Lote / Validade</th>
+                <th>Local</th>
+                <th>Próxima Dose</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="vacinas-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Caixa de Observações Importantes -->
+      <div class="card notes-card">
+        <div class="section-header">
+          <h3>Informações Importantes / Observações do Paciente</h3>
+        </div>
+        <p class="helper-text">Anote alergias, reações vacinais anteriores, comorbidades ou orientações específicas.</p>
+        <textarea
+          id="ficha-observacoes"
+          rows="4"
+          placeholder="Digite aqui observações importantes sobre o paciente..."
+        ></textarea>
+        <div class="notes-actions">
+          <button id="btn-salvar-observacoes" class="btn btn-pink">Salvar Observações</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Cadastro de Novo Paciente -->
+  <div id="modal-paciente" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Cadastrar Novo Paciente</h2>
+        <button class="btn-close-modal" data-close="modal-paciente">✕</button>
+      </div>
+      <form id="form-paciente">
+        <div class="form-group">
+          <label for="pac-nome">Nome Completo *</label>
+          <input type="text" id="pac-nome" required placeholder="Ex: Maria Clara Oliveira" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pac-nascimento">Data de Nascimento *</label>
+            <input type="date" id="pac-nascimento" required />
+            <small id="idade-preview" class="age-hint"></small>
+          </div>
+          <div class="form-group">
+            <label for="pac-cpf">CPF *</label>
+            <input type="text" id="pac-cpf" required maxlength="14" placeholder="000.000.000-00" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="pac-contato">Contato / WhatsApp *</label>
+          <input type="text" id="pac-contato" required maxlength="15" placeholder="(85) 99999-9999" />
+        </div>
+
+        <!-- Seção Condicional para Menor de Idade -->
+        <div id="secao-responsavel" class="responsavel-form-box hidden">
+          <div class="alert-pastel">
+            Paciente menor de 18 anos identificado. Preencha os dados do responsável:
+          </div>
+          <div class="form-group">
+            <label for="resp-nome">Nome do Responsável *</label>
+            <input type="text" id="resp-nome" placeholder="Nome completo do pai, mãe ou tutor" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="resp-cpf">CPF do Responsável *</label>
+              <input type="text" id="resp-cpf" maxlength="14" placeholder="000.000.000-00" />
+            </div>
+            <div class="form-group">
+              <label for="resp-parentesco">Parentesco *</label>
+              <select id="resp-parentesco">
+                <option value="">Selecione...</option>
+                <option value="Mãe">Mãe</option>
+                <option value="Pai">Pai</option>
+                <option value="Avó/Avô">Avó / Avô</option>
+                <option value="Tutor Legal">Tutor Legal</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" data-close="modal-paciente">Cancelar</button>
+          <button type="submit" class="btn btn-blue">Salvar Paciente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar / Editar Aplicação de Vacina -->
+  <div id="modal-vacina" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-vacina-titulo">Registrar Aplicação de Vacina</h2>
+        <button class="btn-close-modal" data-close="modal-vacina">✕</button>
+      </div>
+      <form id="form-vacina">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vac-data">Data de Aplicação *</label>
+            <input type="date" id="vac-data" required />
+          </div>
+          <div class="form-group">
+            <label for="vac-nome">Nome da Vacina *</label>
+            <input type="text" id="vac-nome" required placeholder="Ex: Herpes Zóster, HPV, Gripe..." />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vac-marca">Marca Comercial *</label>
+            <input type="text" id="vac-marca" required placeholder="Ex: Shingrix, Gardasil 9..." />
+          </div>
+          <div class="form-group">
+            <label for="vac-fabricante">Fabricante *</label>
+            <input type="text" id="vac-fabricante" required placeholder="Ex: GSK, MSD, Pfizer..." />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vac-lote">Lote *</label>
+            <input type="text" id="vac-lote" required placeholder="Ex: AB1234C" />
+          </div>
+          <div class="form-group">
+            <label for="vac-validade">Data de Validade *</label>
+            <input type="date" id="vac-validade" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vac-local">Local de Aplicação *</label>
+            <select id="vac-local" required>
+              <option value="">Selecione o local...</option>
+              <option value="Deltoide Direito">Deltoide Direito</option>
+              <option value="Deltoide Esquerdo">Deltoide Esquerdo</option>
+              <option value="Vasto Lateral Coxa Direita">Vasto Lateral da Coxa Direita</option>
+              <option value="Vasto Lateral Coxa Esquerda">Vasto Lateral da Coxa Esquerda</option>
+              <option value="Ventroglúteo Direito">Ventroglúteo Direito</option>
+              <option value="Ventroglúteo Esquerdo">Ventroglúteo Esquerdo</option>
+              <option value="Subcutânea Braço Direito">Subcutânea - Braço Direito</option>
+              <option value="Subcutânea Braço Esquerdo">Subcutânea - Braço Esquerdo</option>
+              <option value="Oral">Via Oral</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="vac-proxima">Data da Próxima Dose (Opcional)</label>
+            <input type="date" id="vac-proxima" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" data-close="modal-vacina">Cancelar</button>
+          <button type="submit" id="btn-submit-vacina" class="btn btn-pink">Registrar Aplicação</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
