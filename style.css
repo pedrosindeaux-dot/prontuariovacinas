@@ -767,3 +767,54 @@ body {
     padding: 3px 4px;
   }
 }
+
+/* Status de Próxima Dose Concluída */
+.badge-success {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.action-buttons-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.btn-concluir-row {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btn-concluir-row:hover {
+  background-color: #bbf7d0;
+}
+
+/* Grupo de Botões da Ficha e Botão Excluir */
+.record-actions-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-danger-outline {
+  background-color: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+.btn-danger-outline:hover {
+  background-color: #ffe4e6;
+  border-color: #fda4af;
+  transform: translateY(-1px);
+}

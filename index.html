@@ -86,7 +86,7 @@
     <!-- Ficha / Prontuário do Paciente Selecionado -->
     <section id="ficha-paciente-section" class="patient-record hidden">
       <div class="record-top-bar">
-        <button id="btn-voltar-lista" class="btn btn-outline">← Voltar para a busca</button>
+        <button id="btn-voltar-lista" class="btn btn-outline">← INICIO</button>
         <span id="badge-menor" class="badge badge-pink hidden">Menor de Idade</span>
       </div>
 
@@ -97,9 +97,17 @@
             <h2 id="ficha-nome">Nome do Paciente</h2>
             <p class="record-meta" id="ficha-idade-nasc">Nascimento: --/--/----</p>
           </div>
-          <button id="btn-abrir-modal-vacina" class="btn btn-blue">
-            + Adicionar Nova Aplicação
-          </button>
+          <div class="record-actions-group">
+            <button id="btn-abrir-modal-vacina" class="btn btn-blue">
+              + Adicionar Nova Aplicação
+            </button>
+            <button id="btn-editar-paciente" class="btn btn-outline" title="Editar dados cadastrais">
+              ✏️ Editar Dados
+            </button>
+            <button id="btn-excluir-paciente" class="btn btn-danger-outline" title="Excluir cadastro do paciente">
+              🗑️ Excluir Paciente
+            </button>
+          </div>
         </div>
 
         <div class="info-grid">
@@ -184,7 +192,7 @@
   <div id="modal-paciente" class="modal hidden">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Cadastrar Novo Paciente</h2>
+        <h2 id="modal-paciente-titulo">Cadastrar Novo Paciente</h2>
         <button class="btn-close-modal" data-close="modal-paciente">✕</button>
       </div>
       <form id="form-paciente">
@@ -240,7 +248,7 @@
 
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" data-close="modal-paciente">Cancelar</button>
-          <button type="submit" class="btn btn-blue">Salvar Paciente</button>
+          <button type="submit" id="btn-submit-paciente" class="btn btn-blue">Salvar Paciente</button>
         </div>
       </form>
     </div>
